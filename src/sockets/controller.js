@@ -1,9 +1,13 @@
 
+import ticketControl from "../models/ticket-control.js";
 
 
-const socketController = (socket) => {
+const socketController = async(socket) => {
     /** Listening */
     console.log(socket.id);
+    await ticketControl.init();
+    const tickets = ticketControl.getTickets;
+    console.log(tickets);
 
     socket.on("send-message", ( payload, callback )=>{
         
@@ -12,6 +16,8 @@ const socketController = (socket) => {
         const id = 12345;
 
         callback(id);
+
+
 
     });
 

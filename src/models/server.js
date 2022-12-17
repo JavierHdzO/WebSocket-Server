@@ -1,4 +1,3 @@
-import path from 'path';
 import { createServer } from 'http';
 import express from 'express';
 import { Server } from 'socket.io';
@@ -6,6 +5,7 @@ import cors from 'cors';
 
 import dbConnection from '../database/config.js';
 import socketController from '../sockets/controller.js';
+import Ticket from './ticket.js';
 
 class Serve {
 
@@ -35,7 +35,6 @@ class Serve {
         // Routes of server
         this.routes();
 
-
         // Sockets
         this.sockets();
 
@@ -43,6 +42,8 @@ class Serve {
     
     async database(){
         await dbConnection();
+        const ticket = new Ticket();
+        ticket.save();
     }
 
     middlewares(){
@@ -60,18 +61,10 @@ class Serve {
     sockets(){
         this.io.on("connection", socketController );
 
-
-       
-
-        
     }
 
 
     listen(){
-        // this.app.listen( this.PORT, ()=> {
-        //     console.log(`Server Listen on Port ${this.PORT}`);
-        // });
-
         this.httpServer.listen(this.PORT, ()=>{
             console.log(`Server Listen on Port ${this.PORT}`);
         });
