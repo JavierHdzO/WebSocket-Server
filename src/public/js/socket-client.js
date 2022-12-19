@@ -1,36 +1,47 @@
-//referencias
 
-const lbOnline  = document.getElementById('lbOnline');
-const lbOffline = document.getElementById('idOffline');
-const txtMessage= document.getElementById('txtMessage');
-const btnSend   = document.getElementById('btnSend');
+// Referencias del HTML
+const lblOnline  = document.querySelector('#lblOnline');
+const lblOffline = document.querySelector('#lblOffline');
+const txtMensaje = document.querySelector('#txtMensaje');
+const btnEnviar  = document.querySelector('#btnEnviar');
 
 
 const socket = io();
 
-socket.on("connect", ()=>{
+
+
+socket.on('connect', () => {
     console.log('Conectado');
-    lbOffline.setAttribute('hidden', true);
-    lbOnline.removeAttribute('hidden', true);
 
-    
+    // lblOffline.style.display = 'none';
+    // lblOnline.style.display  = '';
+
 });
 
-socket.on("disconnect", ()=>{
-    console.log('Desconectado');
-    lbOnline.setAttribute('hidden', true);
-    lbOffline.removeAttribute('hidden', true);
+socket.on('disconnect', () => {
+    // console.log('Desconectado del servidor');
+
+    lblOnline.style.display  = 'none';
+    lblOffline.style.display = '';
 });
 
-btnSend.addEventListener('click', ()=>{
-    const payload =  txtMessage.value;
+
+socket.on('enviar-mensaje', (payload) => {
+    console.log( payload )
+})
+
+
+btnEnviar.addEventListener( 'click', () => {
+
+    const mensaje = txtMensaje.value;
+    const payload = {
+        mensaje,
+        id: '123ABC',
+        fecha: new Date().getTime()
+    }
     
-    socket.emit('send-message', payload, ( id ) => {
-        console.log( id );
+    socket.emit( 'enviar-mensaje', payload, ( id ) => {
+        console.log('Desde el server', id );
     });
 
-});
-
-socket.on('send-msg', ( args ) =>{
-    console.log(args);
 });

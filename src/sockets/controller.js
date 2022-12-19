@@ -1,18 +1,17 @@
 
+import TicketControl from "../models/ticket-control.js";
 
 
-const socketController = (socket) => {
+const socketController = async(socket) => {
     /** Listening */
-    console.log(socket.id);
+    await TicketControl.init();
 
-    socket.on("send-message", ( payload, callback )=>{
-        
-        socket.broadcast.emit('send-msg', payload);
 
-        const id = 12345;
+    socket.emit('last-ticket', TicketControl.lastTicket);
 
-        callback(id);
-
+    socket.on("next-ticket", async( payload, callback )=>{
+        const next = await TicketControl.next();
+        callback(next);
     });
 
 
