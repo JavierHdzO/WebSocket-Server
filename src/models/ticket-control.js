@@ -44,6 +44,14 @@ class TicketControl {
         return last;
     }
 
+    get lastFourTickets(){
+        return lastTickets;
+    }
+
+    get ticketsLenght (){
+        return tickets.length;
+    }
+
     async init (){
         ticketDB = await TicketBD.findOne({
             today: (new Date()).toLocaleDateString()
