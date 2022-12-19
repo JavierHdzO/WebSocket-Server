@@ -1,15 +1,26 @@
-import Ticket from './ticket.js';
+import TicketBD from './ticket.js';
 
+let ticketDB;
 let instance;
 let last = 0;
-let today =new Date().getDate();
+let today =(new Date()).toLocaleDateString();
 let tickets =[];
 let lastTickets =[];
+
+class Ticket{
+
+    constructor( number, desktop ){
+        this.number = number;
+        this.desktop = desktop;
+    }
+
+}
 
 class TicketControl {
 
     constructor(){
-        
+        ticketDB = null;
+
         this.init();
 
         if(instance){
@@ -19,34 +30,105 @@ class TicketControl {
         instance = this;
     }
 
-    
-
     get  getTickets(){
         const ticket = {
-            "last": this.last,
-            "today": this.today,
-            "tickets": this.tickets,
-            "lastTickets": this.lastTickets
+            "last": last,
+            "today": today,
+            "tickets": tickets,
+            "lastTickets": lastTickets
         }
         return  ticket;
     }
 
-    async init (){
-        const ticket = await Ticket.find();
+    get lastTicket(){
+        return last;
+    }
 
-        last = ticket[0].last,
-        today = ticket[0].today,
-        tickets = ticket[0].tickets,
-        lastTickets = ticket[0].lastTickets
+    async init (){
+        ticketDB = await TicketBD.findOne({
+            today: (new Date()).toLocaleDateString()
+        });
+
+        
+        if( ticketDB ){
+            const {  last:lastT, tickets:ticketsT, lastTickets:lastTicketsT } = ticketDB;
+
+            last = lastT;
+            tickets = ticketsT;
+            lastTickets = lastTicketsT
+            return;
+        }
+
+        await this.createTicket();
+
+
+    }
+
+    async createTicket(){
+        const ticketdb = new TicketBD();
+        await ticketdb.save();
+        ticketDB = ticketdb;
     }
 
     async saveDB(){
-        
+        ticketDB.last = last;
+        ticketDB.tickets = tickets;
+        ticketDB.lastTickets = lastTickets;
+
+        await ticketDB.save();
+
     }
+
+
+    async next(){
+        last++;
+        const ticket = new Ticket(last, null);
+        tickets.push( ticket );
+
+        await this.saveDB();
+
+        return 'Ticket ' + last;
+    }
+
+    async checkInTicket( desktop ){
+        if( tickets.length === 0 ){
+            return null;
+        }
+
+        const ticket = tickets.shift();
+
+
+        ticket.desktop = desktop;
+
+        lastTickets.unshift(ticket);
+
+        if(lastTickets.length > 4){
+            lastTickets.splice(-1, 1);
+        }
+
+        await this.saveDB();
+
+        return ticket;
+
+    }
+
 }
 
 /** SigletonTicketControl  */
 
 const sigletonTicketControl = Object.freeze(new TicketControl());
 
+
 export default sigletonTicketControl;
+
+
+// const TicketControl = {
+//     getTickets(){
+//     },
+//     init(){
+//     },
+//     saveDB(){
+//     }
+// };
+
+// Object.freeze(TicketControl);

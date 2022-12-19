@@ -2,8 +2,8 @@ import { Schema, model } from "mongoose";
 
 const ticketSchema = new Schema({
     today:{
-        type: Date,
-        default: Date.now()
+        type: String,
+        default: (new Date()).toLocaleDateString()
     },
     last:{
         type: Number,
