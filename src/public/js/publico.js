@@ -14,6 +14,8 @@ socket.on('disconnect', ()=>{
 
 socket.on('current-status', ( payload ) => {
     
+    const audio = new Audio('./audio/new-ticket.mp3');
+    audio.play();
 
     for (let i = 0; i < lblTickets.length; i++) {
         lblTickets[i].textContent = `Ticket ${ payload[i].number || "X" }`;
